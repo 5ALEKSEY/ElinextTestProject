@@ -1,0 +1,92 @@
+apply plugin: 'com.android.application'
+
+apply plugin: 'kotlin-android'
+
+apply plugin: 'kotlin-android-extensions'
+
+apply plugin: 'kotlin-kapt'
+
+def rootExtConfiguration = rootProject.extensions.getByName("ext")
+
+String VERSION_NAME = rootExtConfiguration["appVersionName"]
+int VERSION_CODE = rootExtConfiguration["appVersionCode"]
+
+int COMPILE_SDK_VERSION = rootExtConfiguration["compileSdkVersion"]
+int MIN_SDK_VERSION = rootExtConfiguration["minSdkVersion"]
+int TARGET_SDK_VERSION = rootExtConfiguration["targetSdkVersion"]
+
+android {
+    compileSdkVersion COMPILE_SDK_VERSION
+    defaultConfig {
+        applicationId "com.ak.elinexttestproject"
+        minSdkVersion MIN_SDK_VERSION
+        targetSdkVersion TARGET_SDK_VERSION
+        versionCode VERSION_CODE
+        versionName VERSION_NAME
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            debuggable false
+            versionNameSuffix 'release'
+
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "FULL_VERSION_NAME", "\"v. " + VERSION_NAME + "\""
+            buildConfigField "String", "API_URL", API_TEST_URL
+        }
+        debug {
+            applicationIdSuffix '.debug'
+            minifyEnabled false
+            debuggable true
+            versionNameSuffix 'debug'
+
+            buildConfigField "String", "FULL_VERSION_NAME", "\"v. " + VERSION_NAME + "-debug\""
+            buildConfigField "String", "API_URL", API_TEST_URL
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "ElinextTestApp_${VERSION_NAME}_${variant.buildType.name}.apk"
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+
+    // libs include
+    implementation deps.kotlin
+    implementation deps.appCompat
+    implementation deps.androidX
+    implementation deps.androidMaterial
+    implementation deps.constraint
+    implementation deps.lifecycle
+
+    implementation deps.dagger
+    kapt deps.daggerKapt
+
+    implementation deps.rx
+    implementation deps.rxAndroid
+
+    implementation deps.recyclerView
+    implementation deps.cardView
+
+    implementation deps.okhttp
+
+    implementation deps.glide
+    kapt deps.glideKapt
+}
